@@ -46,6 +46,34 @@ app.get("/feed", async (req,res) => {
     }
 });
 
+app.delete("/user", async(req,res) => {
+
+    const userId = req.body.userId;
+
+    try {
+        const user = await User.findByIdAndDelete(userId);
+        res.send("User is removed successfully");
+    } catch (error) {
+        res.status(404).send("Something went wrong" + error);
+    }
+
+});
+
+app.patch("/user", async(req,res) => {
+
+    const userId = req.body.userId;
+    const data = req.body;
+
+    try {
+        const dataa = await User.findByIdAndUpdate(userId,data,{returnDocument:"after"});//{returnDocument:"after"} will return doc before/after update.
+        res.send("User is updated successfully");
+    } catch (error) {
+        res.status(404).send("Something went wrong" + error);
+    }
+
+});
+
+
 connectDB()
 .then(()=>{
     console.log("Database connected !!!");
