@@ -59,16 +59,40 @@ app.delete("/user", async(req,res) => {
 
 });
 
-app.patch("/user", async(req,res) => {
+app.patch("/user/:userId", async(req,res) => {
 
-    const userId = req.body.userId;
+    const userId = req.params?.userId;
     const data = req.body;
 
     try {
-        const dataa = await User.findByIdAndUpdate(userId,data,{returnDocument:"after"});//{returnDocument:"after"} will return doc before/after update.
+        const ALLOWED_UPDATES = [
+            "photoURL",
+            "about",
+            "skills",
+            "age"
+        ];
+
+        const isUpdateAllowed = Object.keys(data).every((k)=>
+        ALLOWED_UPDATES.includes(k)
+        );
+
+        if(!isUpdateAllowed){
+            throw new Error("Update not allowed")
+        }
+        if(data?.skills){
+            if(data?.skills.length){
+                throw new Error ("You can add upto 10 skills only")
+            }
+        }
+    
+
+        const dataa = await User.findByIdAndUpdate(userId,data,{
+            returnDocument:"after",//{returnDocument:"after"} will return doc before/after update.
+            runValidators:true,
+        });
         res.send("User is updated successfully");
     } catch (error) {
-        res.status(404).send("Something went wrong" + error);
+        res.status(404).send("Something went wrong.......  " + error.message);
     }
 
 });
