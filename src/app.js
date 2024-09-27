@@ -6,7 +6,6 @@ const app = express();
 app.use(express.json())
 
 app.post("/signup", async (req,res) =>{
-    
     const user = new User(req.body);
     try{
         await user.save();
@@ -17,13 +16,42 @@ app.post("/signup", async (req,res) =>{
     } 
 });
 
+app.get("/user", async (req,res) => {
+    const userEmail = req.body.emailId;
+    
+    try {
+        const users = await User.find({emailID : userEmail});
+        if(users.length === 0){
+            res.status(404).send("User not found");
+        }
+        else{
+            res.send(users);
+        }
+    } catch (error) {
+        res.status(400).send("Something went wrong" + error);
+    }
+});
+
+app.get("/feed", async (req,res) => {
+    try {
+        const users = await User.find({});
+        if(users.length === 0){
+            res.status(404).send("User not found");
+        }
+        else{
+            res.send(users);
+        }
+    } catch (error) {
+        res.status(400).send("Something went wrong" + error);
+    }
+});
 
 connectDB()
 .then(()=>{
     console.log("Database connected !!!");
 
     app.listen(3000,() => {
-        console.log("Server is running...")
+        console.log("Server is running on port 3000...")
     });
     
 })
