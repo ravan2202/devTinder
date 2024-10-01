@@ -45,18 +45,17 @@ app.post("/login", async(req,res) =>{
             throw new Error("Invalid Credentials")
         }
 
-        const isPasswordValid = await bcrypt.compare(password, user.password)
+        const isPasswordValid = await user.validatePassword(password); //schema-method
 
         if(isPasswordValid){
 
-            const token = await jwt.sign({_id : user._id},"Learning@Backend#2202",{
-                expiresIn : "1d", // token expires...
-            });
+            const token = await user.getJWT() ; // shema-method
+
             res.cookie("token" ,token, {
                 expires: new Date(Date.now() + 7 * 3600000), // cookie expires...
             });
 
-            res.send("Login Successful !!!");
+            res.send("Login Successfull !!!");
         }
         else{
             res.send("Invalid Credentials");
